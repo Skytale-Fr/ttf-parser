@@ -35,28 +35,6 @@ public abstract class Glyf implements Cloneable {
 
     public abstract void loadPoints(SuperBufferedInputStream sbis) throws IOException;
 
-    protected boolean verifyFlag(byte b, byte flag) {
-        byte result = (byte) (b & flag);
-        return result > 0;
-    }
-    protected boolean verifyFlag(short b, short flag) {
-        byte result = (byte) (b & flag);
-        return result > 0;
-    }
-    protected boolean verifyFlag(int b, int flag) {
-        byte result = (byte) (b & flag);
-        return result > 0;
-    }
-    protected boolean verifyFlag(byte b, Flag.Byte flag) {
-        return verifyFlag(b, flag.getFlag());
-    }
-    protected boolean verifyFlag(short b, Flag.Int16 flag) {
-        return verifyFlag(b, flag.getFlag());
-    }
-    protected boolean verifyFlag(int b, Flag.Int32 flag) {
-        return verifyFlag(b, flag.getFlag());
-    }
-
     public short getNumberOfContours() {
         return numberOfContours;
     }

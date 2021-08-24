@@ -58,12 +58,10 @@ public class TTFTableManager {
         sortedTables.removeAll(priorityTable);
 
         for(TTFTable table : priorityTable) {
-            System.out.println(table.getTag());
             table.parseAttributes(sbis, this);
         }
 
         for(TTFTable table : sortedTables) {
-            System.out.println(table.getTag());
             table.parseAttributes(sbis, this);
         }
     }

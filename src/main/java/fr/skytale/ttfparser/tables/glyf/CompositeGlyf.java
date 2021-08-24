@@ -1,6 +1,8 @@
 package fr.skytale.ttfparser.tables.glyf;
 
+import fr.skytale.ttfparser.flags.BitFlag;
 import fr.skytale.ttfparser.SuperBufferedInputStream;
+import fr.skytale.ttfparser.flags.UInt16Flag;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -67,7 +69,7 @@ public class CompositeGlyf extends Glyf {
         }
     }
 
-    private static enum CompositeFlag implements Flag.Int32 {
+    private static enum CompositeFlag implements BitFlag.UInt16 {
         // If this is set, the arguments are 16-bit (uint16 or int16);
         // otherwise, they are bytes (uint8 or int8).
         ARG_1_AND_2_ARE_WORDS(0x0001),
@@ -126,7 +128,7 @@ public class CompositeGlyf extends Glyf {
             this.flag = flag;
         }
 
-        public int getFlag() {
+        public java.lang.Integer getBitFlag() {
             return flag;
         }
     }
@@ -140,15 +142,15 @@ public class CompositeGlyf extends Glyf {
     @Override
     public void loadPoints(SuperBufferedInputStream sbis) throws IOException {
         boolean moreComponents = true;
-        int flags = 0;
+        UInt16Flag flags = null;
         while(moreComponents) {
-            flags = sbis.getUShort();
+            flags = new UInt16Flag(sbis.getUShort());
             int glyphIndex = sbis.getUShort();
             Component component = new Component(glyphIndex);
 
-            if(verifyFlag(flags, CompositeFlag.ARG_1_AND_2_ARE_WORDS)) {
+            if(flags.verifyFlag(CompositeFlag.ARG_1_AND_2_ARE_WORDS)) {
                 // The arguments are words
-                if(verifyFlag(flags, CompositeFlag.ARGS_ARE_XY_VALUES)) {
+                if(flags.verifyFlag(CompositeFlag.ARGS_ARE_XY_VALUES)) {
                     // Values are offset
                     component.dx = sbis.getShort();
                     component.dy = sbis.getShort();
@@ -159,7 +161,7 @@ public class CompositeGlyf extends Glyf {
                 }
             } else {
                 // The arguments are bytes
-                if(verifyFlag(flags, CompositeFlag.ARGS_ARE_XY_VALUES)) {
+                if(flags.verifyFlag(CompositeFlag.ARGS_ARE_XY_VALUES)) {
                     // Values are offset
                     component.dx = sbis.getByte();
                     component.dy = sbis.getByte();
@@ -170,15 +172,15 @@ public class CompositeGlyf extends Glyf {
                 }
             }
 
-            if(verifyFlag(flags, CompositeFlag.WE_HAVE_A_SCALE)) {
+            if(flags.verifyFlag(CompositeFlag.WE_HAVE_A_SCALE)) {
                 // We have a scale
                 short scale = sbis.getF2Dot14();
                 component.xScale = scale;
                 component.yScale = scale;
-            } else if(verifyFlag(flags, CompositeFlag.WE_HAVE_AN_X_AND_Y_SCALE)) {
+            } else if(flags.verifyFlag(CompositeFlag.WE_HAVE_AN_X_AND_Y_SCALE)) {
                 component.xScale = sbis.getF2Dot14();
                 component.yScale = sbis.getF2Dot14();
-            } else if(verifyFlag(flags, CompositeFlag.WE_HAVE_A_TWO_BY_TWO)) {
+            } else if(flags.verifyFlag(CompositeFlag.WE_HAVE_A_TWO_BY_TWO)) {
                 component.xScale = sbis.getF2Dot14();
                 component.scale01 = sbis.getF2Dot14();
                 component.scale10 = sbis.getF2Dot14();
@@ -186,9 +188,9 @@ public class CompositeGlyf extends Glyf {
             }
 
             components.add(component);
-            moreComponents = verifyFlag(flags, CompositeFlag.MORE_COMPONENTS);
+            moreComponents = flags.verifyFlag(CompositeFlag.MORE_COMPONENTS);
         }
-        if(verifyFlag(flags, CompositeFlag.WE_HAVE_INSTRUCTIONS)) {
+        if(flags.verifyFlag(CompositeFlag.WE_HAVE_INSTRUCTIONS)) {
             instructionLength = sbis.getUShort();
             for(int i = 0; i < instructionLength; i++) {
                 instructions.add(sbis.getByte());

@@ -35,7 +35,6 @@ public class TTFParser {
             short rangeShift = sbis.getShort();
 
             this.formatInfo = new TTFFormatInfo(scalarType, numTables, searchRange, entrySelector, rangeShift);
-            System.out.println(formatInfo);
 
             for(int tableIndex = 0; tableIndex < numTables; tableIndex++) {
                 tableManager.createTable(sbis);

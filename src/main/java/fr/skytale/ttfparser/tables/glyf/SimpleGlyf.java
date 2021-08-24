@@ -1,6 +1,9 @@
 package fr.skytale.ttfparser.tables.glyf;
 
+import fr.skytale.ttfparser.flags.BitFlag;
 import fr.skytale.ttfparser.SuperBufferedInputStream;
+import fr.skytale.ttfparser.flags.ByteFlag;
+import fr.skytale.ttfparser.flags.UInt8Flag;
 import fr.skytale.ttfparser.tables.TTFPoint;
 import fr.skytale.ttfparser.tables.TTFTableParseException;
 
@@ -10,23 +13,23 @@ import java.util.List;
 
 public class SimpleGlyf extends Glyf {
 
-    private static enum SimpleFlag implements Flag.Byte {
+    private static enum SimpleFlag implements BitFlag.UInt8 {
         // If set, the point is on the curve;
         // Otherwise, it is off the curve.
-        ON_CURVE((byte) 0x01),
+        ON_CURVE((short) 0x01),
 
         // If set, the corresponding x-coordinate is 1 byte long;
         // Otherwise, the corresponding x-coordinate is 2 bytes long
-        X_IS_BYTE((byte) 0x02),
+        X_IS_BYTE((short) 0x02),
         // 	If set, the corresponding y-coordinate is 1 byte long;
         // Otherwise, the corresponding y-coordinate is 2 bytes long
-        Y_IS_BYTE((byte) 0x04),
+        Y_IS_BYTE((short) 0x04),
 
         // 	If set, the next byte specifies the number of additional
         // 	times this set of flags is to be repeated. In this way,
         // 	the number of flags listed can be smaller than the number
         // 	of points in a character.
-        REPEAT((byte) 0x08),
+        REPEAT((short) 0x08),
 
         // This flag has one of two meanings, depending
         // on how the x-Short Vector flag is set:
@@ -39,7 +42,7 @@ public class SimpleGlyf extends Glyf {
         //    - If the x-short Vector bit is not set, and this bit is not set,
         //    the current x-coordinate is a signed 16-bit delta vector.
         //    In this case, the delta vector is the change in x.
-        X_DELTA((byte) 0x10),
+        X_DELTA((short) 0x10),
 
         // 	This flag has one of two meanings, depending
         // 	on how the y-Short Vector flag is set:
@@ -52,7 +55,7 @@ public class SimpleGlyf extends Glyf {
         //     - If the y-short Vector bit is not set, and this bit is not set,
         //     the current y-coordinate is a signed 16-bit delta vector.
         //     In this case, the delta vector is the change in y.
-        Y_DELTA((byte) 0x20),
+        Y_DELTA((short) 0x20),
 
         // If set, contours in the glyph description may overlap.
         // Use of this flag is not required in OpenType — that is,
@@ -61,16 +64,16 @@ public class SimpleGlyf extends Glyf {
         // (See the discussion of "Overlapping contours" in Apple’s specification
         // for details regarding behavior in Apple platforms.)
         // When used, it must be set on the first flag byte for the glyph. See additional details below.
-        OVERLAP_SIMPLE((byte) 0x40);
+        OVERLAP_SIMPLE((short) 0x40);
 
         // Bit 7 are reserved and set to zero.
-        private byte flag;
+        private short flag;
 
-        SimpleFlag(byte flag) {
+        SimpleFlag(short flag) {
             this.flag = flag;
         }
 
-        public byte getFlag() {
+        public java.lang.Short getBitFlag() {
             return flag;
         }
     }
@@ -81,8 +84,8 @@ public class SimpleGlyf extends Glyf {
 
     @Override
     public void loadPoints(SuperBufferedInputStream sbis) throws IOException {
-        List<Byte> flags = new LinkedList<>();
-        byte flag = 0;
+        List<UInt8Flag> flags = new LinkedList<>();
+        UInt8Flag flag = null;
         for(int i = 0; i < numberOfContours; i++) {
             int value = sbis.getUShort();
             contourEnds.add(value);
@@ -98,9 +101,9 @@ public class SimpleGlyf extends Glyf {
 //        numPoints += 1;
         int numPoints = contourEnds.get(contourEnds.size() - 1) + 1;
         for(int i = 0; i < numPoints; i++) {
-            flag = sbis.getByte();
+            flag = new UInt8Flag(sbis.getUByte());
             flags.add(flag);
-            if(verifyFlag(flag, SimpleFlag.REPEAT)) {
+            if(flag.verifyFlag(SimpleFlag.REPEAT)) {
                 byte repeatCount = sbis.getByte();
                 for(int j = 0; j < repeatCount; j++) {
                     flags.add(flag);
@@ -118,7 +121,7 @@ public class SimpleGlyf extends Glyf {
                 for(int i = 0; i < numPoints; i++) {
                     flag = flags.get(i);
                     TTFPoint point = new TTFPoint();
-                    point.setOnCurve(verifyFlag(flag, SimpleFlag.ON_CURVE));
+                    point.setOnCurve(flag.verifyFlag(SimpleFlag.ON_CURVE));
                     point.setLastPointOfContour(contourEnds.indexOf(i) >= 0);
                     points.add(point);
                 }
@@ -152,16 +155,16 @@ public class SimpleGlyf extends Glyf {
      * @return
      * @throws IOException
      */
-    private double parseGlyphCoordinate(SuperBufferedInputStream sbis, byte flag, double previousValue, SimpleFlag shortVectorBitMask, SimpleFlag sameBitMask) throws IOException {
+    private double parseGlyphCoordinate(SuperBufferedInputStream sbis, UInt8Flag flag, double previousValue, SimpleFlag shortVectorBitMask, SimpleFlag sameBitMask) throws IOException {
         double v = 0;
         // If the coordinate is 1 byte long.
-        if(verifyFlag(flag, shortVectorBitMask)) {
+        if(flag.verifyFlag(shortVectorBitMask)) {
             // Read 1 byte.
             v = sbis.getUByte();
 
             // If set, the value is positive,
             // otherwise the value is negative.
-            if(!verifyFlag(flag, sameBitMask)) {
+            if(!flag.verifyFlag(sameBitMask)) {
                 v = -v;
             }
 
@@ -173,7 +176,7 @@ public class SimpleGlyf extends Glyf {
 
             // If the sameBitMask is set, then the current coordinate is
             // the same as the previous coordinate.
-            if(verifyFlag(flag, sameBitMask)) {
+            if(flag.verifyFlag(sameBitMask)) {
                 v = previousValue;
             } else {
                 // Otherwise, the current x-coordinate is a signed 16-bit delta vector.

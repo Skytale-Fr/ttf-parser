@@ -47,12 +47,12 @@ public class SuperBufferedInputStream extends RandomAccessFile {
         return readByte();
     }
 
-    public int getUByte() throws IOException {
+    public short getUByte() throws IOException {
 //        int ch = super.read();
 //        if (ch < 0)
 //            throw new EOFException();
 //        return ch;
-        return getByte() & 0xff;
+        return (short) (getByte() & 0xff);
     }
 
     public short getShort() throws IOException {

@@ -1,7 +1,7 @@
 package fr.skytale.ttfparser.tables;
 
-import fr.skytale.ttfparser.ByteFlag;
 import fr.skytale.ttfparser.SuperBufferedInputStream;
+import fr.skytale.ttfparser.tables.head.FontDecoration;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -21,25 +21,26 @@ public class TTFHeadTable extends TTFTable {
 
     private static final int EXPECTED_MAGIC_NUMBER = 1594834165; // The attribute 'magicNumber' should always be this.
 
-    private short majorVersion;
-    private short minorVersion;
-    private int fontRevision; // Fixed value ???
-    private int checksumAdjustment;
-    private int magicNumber;
-    private ByteFlag flags;
-    private short unitsPerEm;
+    private int majorVersion;
+    private int minorVersion;
+    private int fontRevision;
+    private long checksumAdjustment;
+    private long magicNumber;
+    private int flags;
+    private int unitsPerEm;
     private LocalDateTime created;
     private LocalDateTime modified;
     private short xMin;
     private short yMin;
     private short xMax;
     private short yMax;
-    private short maxStyle;
-    private short lowestRecPPEM;
+    private int macStyle;
+    private int lowestRecPPEM;
     private short fontDirectionHint;
     private short indexToLocFormat;
     private short glyphDataFormat;
 
+    private FontDecoration fontDecoration;
 
     public TTFHeadTable(SuperBufferedInputStream sbis, TTFTableManager tableManager) throws IOException {
         super("head", sbis, tableManager);
@@ -47,32 +48,33 @@ public class TTFHeadTable extends TTFTable {
 
     @Override
     public void loadAttributes(SuperBufferedInputStream sbis, TTFTableManager tableManager) throws IOException {
-        majorVersion = sbis.getShort();
-        minorVersion = sbis.getShort();
+        majorVersion = sbis.getUShort();
+        minorVersion = sbis.getUShort();
         fontRevision = sbis.getFixed();
-        checksumAdjustment = sbis.getInt(SuperBufferedInputStream.INTFormat.INT32);
-        magicNumber = sbis.getInt(SuperBufferedInputStream.INTFormat.INT32);
+        checksumAdjustment = sbis.getUInt(SuperBufferedInputStream.INTFormat.INT32);
+        magicNumber = sbis.getUInt(SuperBufferedInputStream.INTFormat.INT32);
         if(magicNumber != EXPECTED_MAGIC_NUMBER) throw new TTFTableParseException("magicNumber", magicNumber, EXPECTED_MAGIC_NUMBER);
-        flags = new ByteFlag(sbis.getShort());
-        unitsPerEm = sbis.getShort();
+        flags = sbis.getUShort();
+        unitsPerEm = sbis.getUShort();
         created = sbis.getDate();
         modified = sbis.getDate();
         xMin = sbis.getShort();
         yMin = sbis.getShort();
         xMax = sbis.getShort();
         yMax = sbis.getShort();
-        maxStyle = sbis.getShort();
-        lowestRecPPEM = sbis.getShort();
+        macStyle = sbis.getUShort();
+        fontDecoration = new FontDecoration(macStyle);
+        lowestRecPPEM = sbis.getUShort();
         fontDirectionHint = sbis.getShort();
         indexToLocFormat = sbis.getShort();
         glyphDataFormat = sbis.getShort();
     }
 
-    public short getMajorVersion() {
+    public int getMajorVersion() {
         return majorVersion;
     }
 
-    public short getMinorVersion() {
+    public int getMinorVersion() {
         return minorVersion;
     }
 
@@ -80,19 +82,19 @@ public class TTFHeadTable extends TTFTable {
         return fontRevision;
     }
 
-    public int getChecksumAdjustment() {
+    public long getChecksumAdjustment() {
         return checksumAdjustment;
     }
 
-    public int getMagicNumber() {
+    public long getMagicNumber() {
         return magicNumber;
     }
 
-    public ByteFlag getFlags() {
+    public int getFlags() {
         return flags;
     }
 
-    public short getUnitsPerEm() {
+    public int getUnitsPerEm() {
         return unitsPerEm;
     }
 
@@ -120,11 +122,11 @@ public class TTFHeadTable extends TTFTable {
         return yMax;
     }
 
-    public short getMaxStyle() {
-        return maxStyle;
+    public int getMacStyle() {
+        return macStyle;
     }
 
-    public short getLowestRecPPEM() {
+    public int getLowestRecPPEM() {
         return lowestRecPPEM;
     }
 
@@ -138,6 +140,10 @@ public class TTFHeadTable extends TTFTable {
 
     public short getGlyphDataFormat() {
         return glyphDataFormat;
+    }
+
+    public FontDecoration getFontDecoration() {
+        return fontDecoration;
     }
 
     @Override
@@ -156,11 +162,12 @@ public class TTFHeadTable extends TTFTable {
                 ", yMin=" + yMin +
                 ", xMax=" + xMax +
                 ", yMax=" + yMax +
-                ", maxStyle=" + maxStyle +
+                ", macStyle=" + macStyle +
                 ", lowestRecPPEM=" + lowestRecPPEM +
                 ", fontDirectionHint=" + fontDirectionHint +
                 ", indexToLocFormat=" + indexToLocFormat +
                 ", glyphDataFormat=" + glyphDataFormat +
+                ", fontDecoration=" + fontDecoration +
                 ", checksum=" + checksum +
                 ", offset=" + offset +
                 ", length=" + length +
