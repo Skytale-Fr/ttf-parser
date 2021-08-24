@@ -19,7 +19,7 @@ before_script:
 .build: &build
   stage: build
   script:
-    - gradle --build-cache shadowJar
+    - gradle --build-cache jar
     - ls ./build/libs
   cache:
     key: "$CI_COMMIT_REF_NAME"
