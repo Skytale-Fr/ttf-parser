@@ -5,6 +5,7 @@ import fr.skytale.ttfparser.tables.cmap.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -91,7 +92,7 @@ public class TTFCmapTable extends TTFTable {
 
             boolean isWindowsPlatform = platformID == 3 &&
                     (encodingID == 0 || encodingID == 1 || encodingID == 10);
-            boolean isUnicodePlatform = platformID == 0 && List.of(new Integer[]{0, 1, 2, 3, 4}).contains(Integer.valueOf(encodingID));
+            boolean isUnicodePlatform = platformID == 0 && Arrays.asList(new Integer[]{0, 1, 2, 3, 4}).contains(Integer.valueOf(encodingID));
 
             if(isWindowsPlatform || isUnicodePlatform) {
                 selectedOffset = offset;
