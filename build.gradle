@@ -1,0 +1,97 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '4.+')
+    }
+}
+
+//From jfrog artifactory sample : https://github.com/jfrog/project-examples/blob/master/gradle-examples/gradle-example-minimal/build.gradle#L53
+plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'java'
+}
+
+group = 'fr.skytale'
+version = '1.0.2'
+
+compileJava {
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+        maven { url 'https://repository.lasers-enigma.eu:443/r' }
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'https://jitpack.io' }
+    maven {
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+        content {
+            includeGroup 'org.bukkit'
+            includeGroup 'org.spigotmc'
+        }
+    }
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    maven { url 'https://oss.sonatype.org/content/groups/public/' }
+
+    maven { url "https://maven.enginehub.org/repo/" }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+}
+
+tasks.withType(Javadoc) {
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+sourceSets.main.resources {
+    srcDirs "src/main/resources"
+}
+
+/**
+ * Ignore an error during compilation due to version 7.0 of Gradle (version that supports Java 16).
+ */
+tasks.named("processResources") {
+    duplicatesStrategy = DuplicatesStrategy.WARN
+}
+
+if (project.hasProperty('artifactory_user')) {
+    apply plugin: 'com.jfrog.artifactory'
+    apply plugin: 'java'
+    apply plugin: 'maven-publish'
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+            }
+        }
+    }
+
+    artifactory {
+        contextUrl = 'https://repository.lasers-enigma.eu:443/'
+        publish {
+            repository {
+                repoKey = 'r' // The Artifactory repository key to publish to
+                username = "${artifactory_user}" // The publisher user name
+                password = "${artifactory_password}" // The publisher password
+            }
+            defaults {
+                // Reference to Gradle publications defined in the build script.
+                // This is how we tell the Artifactory Plugin which artifacts should be
+                // published to Artifactory.
+                publications('mavenJava')
+                publishArtifacts = true
+            }
+        }
+    }
+}
