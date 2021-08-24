@@ -95,9 +95,9 @@ public abstract class Glyf implements Cloneable {
 
     public List<List<TTFPoint>> getContours() {
         List<List<TTFPoint>> contours = new LinkedList<>();
+        List<TTFPoint> contour = new LinkedList<>();
         int contourEndsIndex = 0;
         for(int i = 0; i < points.size(); i++) {
-            List<TTFPoint> contour = new LinkedList<>();
             TTFPoint point = points.get(i);
             contour.add(point);
             if(contourEnds.get(contourEndsIndex) == i) {
