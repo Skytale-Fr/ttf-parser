@@ -1,3 +1,5 @@
+//https://github.com/jfrog/project-examples/blob/master/gradle-examples/gradle-example-minimal/build.gradle#L53
+
 buildscript {
     repositories {
         mavenCentral()
@@ -7,10 +9,8 @@ buildscript {
     }
 }
 
-//From jfrog artifactory sample : https://github.com/jfrog/project-examples/blob/master/gradle-examples/gradle-example-minimal/build.gradle#L53
 plugins {
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
-    id 'java'
+    id "java"
 }
 
 group = 'fr.skytale'
