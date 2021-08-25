@@ -69,7 +69,7 @@ public class TTFAlphabet {
         TTFCharacter ttfCharacter = characterMap.get(c);
         TTFHeadTable headTable = tableManager.getTable(TTFTableManager.HEAD);
         int unitsPerEm = headTable.getUnitsPerEm();
-        double scaleFactor = (1.0d / unitsPerEm) * fontSize * 1000;
+        double scaleFactor = (1.0d / unitsPerEm) * fontSize;
         return ttfCharacter.scale(scaleFactor, scaleFactor);
     }
 
@@ -82,14 +82,10 @@ public class TTFAlphabet {
             throw new TTFCharacterNotSupportedException(String.format("The provided string '%s' is not supported by the loaded font.", s));
         TTFCharacter[] ttfCharacters = new TTFCharacter[s.length()];
 
-        TTFHeadTable headTable = tableManager.getTable(TTFTableManager.HEAD);
-        int unitsPerEm = headTable.getUnitsPerEm();
-        double scaleFactor = (1.0d / unitsPerEm) * fontSize * 1000;
-
         for(int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            TTFCharacter ttfCharacter = getCharacter(c);
-            ttfCharacters[i] = ttfCharacter.scale(scaleFactor, scaleFactor);
+            TTFCharacter ttfCharacter = getCharacter(c, fontSize);
+            ttfCharacters[i] = ttfCharacter;
         }
 
         TTFString ttfString = new TTFString(ttfCharacters);
