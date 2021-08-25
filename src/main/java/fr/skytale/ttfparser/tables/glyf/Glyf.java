@@ -10,12 +10,12 @@ import java.util.List;
 public abstract class Glyf implements Cloneable {
 
     protected short numberOfContours;
-    protected short xMin;
-    protected short yMin;
-    protected short xMax;
-    protected short yMax;
-    protected short width;
-    protected short height;
+    protected double xMin;
+    protected double yMin;
+    protected double xMax;
+    protected double yMax;
+    protected double width;
+    protected double height;
 
     protected List<TTFPoint> points = new LinkedList<>();
     protected List<Integer> contourEnds = new LinkedList<>();
@@ -39,27 +39,27 @@ public abstract class Glyf implements Cloneable {
         return numberOfContours;
     }
 
-    public short getXMin() {
+    public double getXMin() {
         return xMin;
     }
 
-    public short getYMin() {
+    public double getYMin() {
         return yMin;
     }
 
-    public short getXMax() {
+    public double getXMax() {
         return xMax;
     }
 
-    public short getYMax() {
+    public double getYMax() {
         return yMax;
     }
 
-    public short getWidth() {
+    public double getWidth() {
         return width;
     }
 
-    public short getHeight() {
+    public double getHeight() {
         return height;
     }
 
@@ -89,12 +89,12 @@ public abstract class Glyf implements Cloneable {
 
     public Glyf scale(double scaleX, double scaleY) {
         Glyf clone = clone();
-        clone.xMin = (short) (xMin * scaleX);
-        clone.yMin = (short) (yMin * scaleY);
-        clone.xMax = (short) (xMax * scaleX);
-        clone.yMax = (short) (yMax * scaleY);
-        this.width = (short) (getXMax() - getXMin());
-        this.height = (short) (getYMax() - getYMin());
+        clone.xMin = xMin * scaleX;
+        clone.yMin = yMin * scaleY;
+        clone.xMax = xMax * scaleX;
+        clone.yMax = yMax * scaleY;
+        clone.width = (clone.xMax - clone.xMin);
+        clone.height = (clone.yMax - clone.yMin);
         for(TTFPoint point : clone.points) {
             point.x *= scaleX;
             point.y *= scaleY;

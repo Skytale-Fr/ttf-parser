@@ -1,10 +1,7 @@
 package fr.skytale.ttfparser;
 
-import fr.skytale.ttfparser.tables.TTFGlyfTable;
-import fr.skytale.ttfparser.tables.TTFHmtxTable;
-import fr.skytale.ttfparser.tables.TTFTableManager;
+import fr.skytale.ttfparser.tables.*;
 import fr.skytale.ttfparser.tables.cmap.GlyfIndexMap;
-import fr.skytale.ttfparser.tables.TTFCmapTable;
 import fr.skytale.ttfparser.tables.glyf.Glyf;
 
 import java.util.*;
@@ -64,20 +61,39 @@ public class TTFAlphabet {
     }
 
     public TTFCharacter getCharacter(char c) throws TTFCharacterNotSupportedException {
-        if(!supportCharacter(c)) throw new TTFCharacterNotSupportedException(c);
-        return characterMap.get(c);
+        return getCharacter(c, 1);
     }
 
-    public TTFString getString(String s) throws TTFCharacterNotSupportedException {
+    public TTFCharacter getCharacter(char c, double fontSize) throws TTFCharacterNotSupportedException {
+        if(!supportCharacter(c)) throw new TTFCharacterNotSupportedException(c);
+        TTFCharacter ttfCharacter = characterMap.get(c);
+        TTFHeadTable headTable = tableManager.getTable(TTFTableManager.HEAD);
+        int unitsPerEm = headTable.getUnitsPerEm();
+        double scaleFactor = (1.0d / unitsPerEm) * fontSize * 1000;
+        return ttfCharacter.scale(scaleFactor, scaleFactor);
+    }
+
+    public TTFString getString(String s) {
+        return getString(s, 1);
+    }
+
+    public TTFString getString(String s, double fontSize) throws TTFCharacterNotSupportedException {
         if(!supportString(s))
             throw new TTFCharacterNotSupportedException(String.format("The provided string '%s' is not supported by the loaded font.", s));
         TTFCharacter[] ttfCharacters = new TTFCharacter[s.length()];
+
+        TTFHeadTable headTable = tableManager.getTable(TTFTableManager.HEAD);
+        int unitsPerEm = headTable.getUnitsPerEm();
+        double scaleFactor = (1.0d / unitsPerEm) * fontSize * 1000;
+
         for(int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             TTFCharacter ttfCharacter = getCharacter(c);
-            ttfCharacters[i] = ttfCharacter;
+            ttfCharacters[i] = ttfCharacter.scale(scaleFactor, scaleFactor);
         }
-        return new TTFString(ttfCharacters);
+
+        TTFString ttfString = new TTFString(ttfCharacters);
+        return ttfString;
     }
 
     private void processCharacter(SuperBufferedInputStream sbis, char c, Glyf glyf, TTFHmtxTable.HMetric hMetric) {
@@ -87,8 +103,8 @@ public class TTFAlphabet {
 //            return;
 //        }
 
-        short lsb = hMetric.getLeftSideBearing();
-        short rsb = (short) (hMetric.getAdvanceWidth() - hMetric.getLeftSideBearing() - (glyf.getXMax() - glyf.getXMin()));
+        double lsb = hMetric.getLeftSideBearing();
+        double rsb = hMetric.getAdvanceWidth() - hMetric.getLeftSideBearing() - (glyf.getXMax() - glyf.getXMin());
         TTFCharacter ttfCharacter = new TTFCharacter(c, lsb, rsb, glyf, hMetric);
         characterMap.put(c, ttfCharacter);
     }

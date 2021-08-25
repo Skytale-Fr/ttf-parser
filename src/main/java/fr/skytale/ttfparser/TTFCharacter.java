@@ -8,12 +8,12 @@ import java.util.Objects;
 public class TTFCharacter implements Cloneable {
 
     private char character;
-    private short lsb;
-    private short rsb;
+    private double lsb;
+    private double rsb;
     private Glyf glyf;
     private TTFHmtxTable.HMetric hMetric;
 
-    public TTFCharacter(char character, short lsb, short rsb, Glyf glyf, TTFHmtxTable.HMetric hMetric) {
+    public TTFCharacter(char character, double lsb, double rsb, Glyf glyf, TTFHmtxTable.HMetric hMetric) {
         this.character = character;
         this.lsb = lsb;
         this.rsb = rsb;
@@ -25,11 +25,11 @@ public class TTFCharacter implements Cloneable {
         return character;
     }
 
-    public short getLsb() {
+    public double getLsb() {
         return lsb;
     }
 
-    public short getRsb() {
+    public double getRsb() {
         return rsb;
     }
 
@@ -39,6 +39,8 @@ public class TTFCharacter implements Cloneable {
 
     public TTFCharacter scale(double scaleX, double scaleY) {
         TTFCharacter clone = clone();
+        clone.lsb = lsb * scaleX;
+        clone.rsb = rsb * scaleY;
         clone.glyf = glyf.scale(scaleX, scaleY);
         clone.hMetric = hMetric.scale(scaleX, scaleY);
         return clone;

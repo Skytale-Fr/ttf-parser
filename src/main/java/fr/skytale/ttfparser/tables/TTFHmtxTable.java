@@ -23,22 +23,22 @@ import java.util.List;
 public class TTFHmtxTable extends TTFTable {
 
     public class HMetric implements Cloneable {
-        private int advanceWidth;
-        private short leftSideBearing;
+        private double advanceWidth;
+        private double leftSideBearing;
         protected HMetric(int advanceWidth, short leftSideBearing) {
             this.advanceWidth = advanceWidth;
             this.leftSideBearing = leftSideBearing;
         }
-        public int getAdvanceWidth() {
+        public double getAdvanceWidth() {
             return advanceWidth;
         }
-        public short getLeftSideBearing() {
+        public double getLeftSideBearing() {
             return leftSideBearing;
         }
         public HMetric scale(double scaleX, double scaleY) {
             HMetric clone = clone();
-            clone.advanceWidth = (int) (advanceWidth * scaleX);
-            clone.leftSideBearing = (short) (leftSideBearing * scaleY);
+            clone.advanceWidth = advanceWidth * scaleX;
+            clone.leftSideBearing = leftSideBearing * scaleX;
             return clone;
         }
         @Override
