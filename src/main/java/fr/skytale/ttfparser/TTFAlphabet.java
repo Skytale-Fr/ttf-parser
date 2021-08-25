@@ -56,6 +56,8 @@ public class TTFAlphabet {
     }
 
     public boolean supportString(String s) {
+        if(s.isEmpty()) return true;
+
         String[] characters = s.split("");
         for(String character : characters) {
             char c = character.charAt(0);
