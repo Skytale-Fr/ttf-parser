@@ -3,16 +3,16 @@ package fr.skytale.ttfparser;
 import fr.skytale.ttfparser.tables.*;
 import fr.skytale.ttfparser.tables.cmap.GlyfIndexMap;
 import fr.skytale.ttfparser.tables.glyf.Glyf;
+import fr.skytale.ttfparser.tables.glyf.UnknownGlyf;
 
 import java.util.*;
 
 public class TTFAlphabet {
 
-    private static final String SUPPORTED_ALPHABET =
-            "!\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
-
     private TTFTableManager tableManager;
-    private Map<Character, TTFCharacter> characterMap = new HashMap<>();
+    private TTFCharacter unknownCharacter;
+    private TTFCharacter spaceCharacter;
+    private Map<Integer, TTFCharacter> characterMap = new HashMap<>();
 
     public TTFAlphabet(SuperBufferedInputStream sbis, TTFTableManager tableManager) {
         this.tableManager = tableManager;
@@ -25,21 +25,25 @@ public class TTFAlphabet {
         TTFHmtxTable hmtxTable = tableManager.getTable(TTFTableManager.HMTX);
         List<TTFHmtxTable.HMetric> hMetrics = hmtxTable.getHMetrics();
 
-        String[] characters = SUPPORTED_ALPHABET.split("");
-        for(String character : characters) {
-            char c = character.charAt(0);
-            int charCode = (int) c;
+        Set<Integer> charCodes = glyfIndexMap.keySet();
+
+        unknownCharacter = createCharacter(0, glyfs.get(0), hMetrics.get(0));
+        Integer spaceIndex = glyfIndexMap.get((int) ' ');
+        spaceCharacter = createCharacter((int) ' ', new UnknownGlyf((short) 0, (short) 0, (short) 0, (short) 0, (short) 0), hMetrics.get(spaceIndex));
+
+        for(int charCode : charCodes) {
+            char c = (char) charCode;
 
             Integer index = glyfIndexMap.get(charCode);
             if(index == null) {
-                System.out.println("index null for " + c);
+                index = 0;
                 return;
             }
 
             try {
                 Glyf glyf = glyfs.get(index);
                 TTFHmtxTable.HMetric hMetric = hMetrics.get(index);
-                processCharacter(sbis, c, glyf, hMetric);
+                processCharacter(sbis, charCode, glyf, hMetric);
             } catch(IndexOutOfBoundsException e) {
                 System.out.println("Metrics not found for " + c + "(" + charCode + ") at index " + index + ".");
             }
@@ -47,7 +51,7 @@ public class TTFAlphabet {
     }
 
     public boolean supportCharacter(char c) {
-        TTFCharacter ttfCharacter = characterMap.get(c);
+        TTFCharacter ttfCharacter = characterMap.get((int) c);
         return ttfCharacter != null;
     }
 
@@ -65,11 +69,17 @@ public class TTFAlphabet {
     }
 
     public TTFCharacter getCharacter(char c, double fontSize) throws TTFCharacterNotSupportedException {
-        if(!supportCharacter(c)) throw new TTFCharacterNotSupportedException(c);
-        TTFCharacter ttfCharacter = characterMap.get(c);
         TTFHeadTable headTable = tableManager.getTable(TTFTableManager.HEAD);
         int unitsPerEm = headTable.getUnitsPerEm();
         double scaleFactor = (1.0d / unitsPerEm) * fontSize;
+
+        if(!supportCharacter(c)) {
+            return unknownCharacter.scale(scaleFactor, scaleFactor);
+        }
+        if(c == ' ') {
+            return spaceCharacter.scale(scaleFactor, scaleFactor);
+        }
+        TTFCharacter ttfCharacter = characterMap.get((int) c);
         return ttfCharacter.scale(scaleFactor, scaleFactor);
     }
 
@@ -92,17 +102,15 @@ public class TTFAlphabet {
         return ttfString;
     }
 
-    private void processCharacter(SuperBufferedInputStream sbis, char c, Glyf glyf, TTFHmtxTable.HMetric hMetric) {
-//        if(glyf.getNumberOfContours() == 0) {
-//            System.out.println("Number of contours equals to zero for " + c);
-//            System.out.println(glyf);
-//            return;
-//        }
-
+    private TTFCharacter createCharacter(int charCode, Glyf glyf, TTFHmtxTable.HMetric hMetric) {
         double lsb = hMetric.getLeftSideBearing();
         double rsb = hMetric.getAdvanceWidth() - hMetric.getLeftSideBearing() - (glyf.getXMax() - glyf.getXMin());
-        TTFCharacter ttfCharacter = new TTFCharacter(c, lsb, rsb, glyf, hMetric);
-        characterMap.put(c, ttfCharacter);
+        return new TTFCharacter((char) charCode, lsb, rsb, glyf, hMetric);
+    }
+
+    private void processCharacter(SuperBufferedInputStream sbis, int charCode, Glyf glyf, TTFHmtxTable.HMetric hMetric) {
+        TTFCharacter ttfCharacter = createCharacter(charCode, glyf, hMetric);
+        characterMap.put(charCode, ttfCharacter);
     }
 
 }

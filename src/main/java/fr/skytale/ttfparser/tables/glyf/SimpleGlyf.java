@@ -10,6 +10,7 @@ import fr.skytale.ttfparser.tables.TTFTableParseException;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class SimpleGlyf extends Glyf {
 
@@ -97,9 +98,9 @@ public class SimpleGlyf extends Glyf {
             instructions.add(value);
         }
 
-//        int numPoints = contourEnds.stream().mapToInt(v -> v).max().orElseThrow(NoSuchElementException::new);
-//        numPoints += 1;
-        int numPoints = contourEnds.get(contourEnds.size() - 1) + 1;
+        int numPoints = contourEnds.stream().mapToInt(v -> v).max().orElse(0);
+        if(numPoints > 0) numPoints += 1;
+//        int numPoints = contourEnds.get(contourEnds.size() - 1) + 1;
         for(int i = 0; i < numPoints; i++) {
             flag = new UInt8Flag(sbis.getUByte());
             flags.add(flag);
