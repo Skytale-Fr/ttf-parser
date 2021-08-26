@@ -44,10 +44,6 @@ repositories {
     maven { url "https://maven.enginehub.org/repo/" }
 }
 
-dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
-}
-
 tasks.withType(Javadoc) {
     options.addStringOption('Xdoclint:none', '-quiet')
     options.addStringOption('encoding', 'UTF-8')
