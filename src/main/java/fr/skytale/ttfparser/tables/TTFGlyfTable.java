@@ -52,7 +52,7 @@ public class TTFGlyfTable extends TTFTable {
             Glyf glyf = null;
 
             if(numberOfContours == 0) {
-                System.out.println("Num contour zero for " + i);
+                System.out.println("TTFParser: TTFGlygTable: Num contour zero for " + i);
             }
             if(numberOfContours >= 0) {
                 glyf = new SimpleGlyf(numberOfContours, xMin, yMin, xMax, yMax);
