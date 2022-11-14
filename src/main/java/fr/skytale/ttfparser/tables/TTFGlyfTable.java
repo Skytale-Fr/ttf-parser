@@ -54,11 +54,11 @@ public class TTFGlyfTable extends TTFTable {
             if(numberOfContours == 0) {
                 System.out.println("TTFParser: TTFGlygTable: Num contour zero for " + i);
             }
-            if(numberOfContours >= 0) {
+            if(numberOfContours > 0) {
                 glyf = new SimpleGlyf(numberOfContours, xMin, yMin, xMax, yMax);
-//            } else if(numberOfContours == 0) {
-//                // What the fuck is going on here ????
-//                glyf = new UnknownGlyf(numberOfContours, xMin, yMin, xMax, yMax);
+            } else if(numberOfContours == 0) {
+                // What the fuck is going on here ????
+                glyf = new UnknownGlyf(numberOfContours, xMin, yMin, xMax, yMax);
             } else {
                 // Composite glyphs
                 // For composite glyphs, numberOfContours should be equals to -1.

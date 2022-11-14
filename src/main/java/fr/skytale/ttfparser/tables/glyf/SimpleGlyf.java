@@ -26,7 +26,7 @@ public class SimpleGlyf extends Glyf {
         // Otherwise, the corresponding y-coordinate is 2 bytes long
         Y_IS_BYTE((short) 0x04),
 
-        // 	If set, the next byte specifies the number of additional
+        // 	If set, the next byte (read as unsigned) specifies the number of additional
         // 	times this set of flags is to be repeated. In this way,
         // 	the number of flags listed can be smaller than the number
         // 	of points in a character.
@@ -94,18 +94,18 @@ public class SimpleGlyf extends Glyf {
 
         instructionLength = sbis.getUShort();
         for(int i = 0; i < instructionLength; i++) {
-            byte value = sbis.getByte();
+            short value = sbis.getUByte();
             instructions.add(value);
         }
 
-        int numPoints = contourEnds.stream().mapToInt(v -> v).max().orElse(0);
-        if(numPoints > 0) numPoints += 1;
-//        int numPoints = contourEnds.get(contourEnds.size() - 1) + 1;
+//        int numPoints = contourEnds.stream().mapToInt(v -> v).max().orElse(0);
+//        if(numPoints > 0) numPoints += 1;
+        int numPoints = contourEnds.get(contourEnds.size() - 1) + 1;
         for(int i = 0; i < numPoints; i++) {
             flag = new UInt8Flag(sbis.getUByte());
             flags.add(flag);
             if(flag.verifyFlag(SimpleFlag.REPEAT)) {
-                byte repeatCount = sbis.getByte();
+                short repeatCount = sbis.getUByte();
                 for(int j = 0; j < repeatCount; j++) {
                     flags.add(flag);
                     i += 1;

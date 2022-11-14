@@ -21,7 +21,7 @@ public abstract class Glyf implements Cloneable {
     protected List<Integer> contourEnds = new LinkedList<>();
 
     protected int instructionLength = 0;
-    protected List<Byte> instructions = new LinkedList<>();
+    protected List<Short> instructions = new LinkedList<>();
 
     public Glyf(short numberOfContours, short xMin, short yMin, short xMax, short yMax) {
         this.numberOfContours = numberOfContours;
