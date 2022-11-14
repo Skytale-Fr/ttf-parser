@@ -44,8 +44,6 @@ public class TTFAlphabet {
             try {
                 Glyf glyf = glyfs.get(gid);
                 TTFHmtxTable.HMetric hMetric = hMetrics.get(gid);
-                System.out.println(glyf);
-                System.out.println(hMetric);
                 processCharacter(sbis, charCode, glyf, hMetric);
             } catch(IndexOutOfBoundsException e) {
                 System.out.println("Metrics not found for " + c + "(" + charCode + ") at index " + gid + ".");
