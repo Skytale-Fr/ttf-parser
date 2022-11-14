@@ -7,9 +7,7 @@ import fr.skytale.ttfparser.tables.glyf.SimpleGlyf;
 import fr.skytale.ttfparser.tables.glyf.UnknownGlyf;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * GLYF Table documentation:
@@ -19,7 +17,7 @@ import java.util.List;
  */
 public class TTFGlyfTable extends TTFTable {
 
-    private List<Glyf> glyfs = new ArrayList<>();
+    private LinkedList<Glyf> glyfs = new LinkedList<>();
 
     public TTFGlyfTable(SuperBufferedInputStream sbis, TTFTableManager tableManager) throws IOException {
         super("glyf", sbis, tableManager);
@@ -35,13 +33,29 @@ public class TTFGlyfTable extends TTFTable {
         short indexToLocFormat = headTable.getIndexToLocFormat();
         boolean fetchAsShort = indexToLocFormat == 0;
 
-        for(int i = 0; i < locationCount - 1; i++) {
+        TTFMaxpTable maxpTable = tableManager.getTable(TTFTableManager.MAXP);
+        int numGlyphs = maxpTable.getNumGlyphs();
+        long endOfGlyphs = locations.get(numGlyphs);
+
+        for(int i = 0; i < numGlyphs; i++) {
 //            int multiplier = (fetchAsShort ? 2 : 1);
             long locaOffset = locations.get(i); //* multiplier;
+            if (endOfGlyphs != 0 && endOfGlyphs == locaOffset) {
+                break;
+            }
+            if (locations.get(i + 1) <= locaOffset) {
+                glyfs.add(new UnknownGlyf((short) 0, (short) 0, (short) 0, (short) 0, (short) 0));
+                continue;
+            }
+
             sbis.setPos(offset + locaOffset);
 
             // = Number of shape
             short numberOfContours = sbis.getShort();
+            if (locaOffset + numberOfContours > endOfGlyphs) {
+                glyfs.add(new UnknownGlyf((short) 0, (short) 0, (short) 0, (short) 0, (short) 0));
+                continue;
+            }
             short xMin = sbis.getShort();
             short yMin = sbis.getShort();
             short xMax = sbis.getShort();
@@ -54,11 +68,11 @@ public class TTFGlyfTable extends TTFTable {
             if(numberOfContours == 0) {
                 System.out.println("TTFParser: TTFGlygTable: Num contour zero for " + i);
             }
-            if(numberOfContours > 0) {
+            if(numberOfContours >= 0) {
                 glyf = new SimpleGlyf(numberOfContours, xMin, yMin, xMax, yMax);
-            } else if(numberOfContours == 0) {
-                // What the fuck is going on here ????
-                glyf = new UnknownGlyf(numberOfContours, xMin, yMin, xMax, yMax);
+//            } else if(numberOfContours == 0) {
+//                // What the fuck is going on here ????
+//                glyf = new UnknownGlyf(numberOfContours, xMin, yMin, xMax, yMax);
             } else {
                 // Composite glyphs
                 // For composite glyphs, numberOfContours should be equals to -1.

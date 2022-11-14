@@ -6,6 +6,7 @@ import fr.skytale.ttfparser.tables.glyf.Glyf;
 import fr.skytale.ttfparser.tables.glyf.UnknownGlyf;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class TTFAlphabet {
 
@@ -34,20 +35,26 @@ public class TTFAlphabet {
         for(int charCode : charCodes) {
             char c = (char) charCode;
 
-            Integer index = glyfIndexMap.get(charCode);
-            if(index == null) {
-                index = 0;
+            Integer gid = glyfIndexMap.get(charCode);
+            if(gid == null) {
+                gid = 0;
                 return;
             }
 
             try {
-                Glyf glyf = glyfs.get(index);
-                TTFHmtxTable.HMetric hMetric = hMetrics.get(index);
+                Glyf glyf = glyfs.get(gid);
+                TTFHmtxTable.HMetric hMetric = hMetrics.get(gid);
+                System.out.println(glyf);
+                System.out.println(hMetric);
                 processCharacter(sbis, charCode, glyf, hMetric);
             } catch(IndexOutOfBoundsException e) {
-                System.out.println("Metrics not found for " + c + "(" + charCode + ") at index " + index + ".");
+                System.out.println("Metrics not found for " + c + "(" + charCode + ") at index " + gid + ".");
             }
         }
+    }
+
+    public Set<Character> getSupportedCharacters() {
+        return characterMap.keySet().stream().map(intValue -> (char) intValue.intValue()).collect(Collectors.toSet());
     }
 
     public boolean supportCharacter(char c) {

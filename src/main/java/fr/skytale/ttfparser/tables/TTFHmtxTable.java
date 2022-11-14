@@ -3,8 +3,7 @@ package fr.skytale.ttfparser.tables;
 import fr.skytale.ttfparser.SuperBufferedInputStream;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * HMTX Table documentation:
@@ -62,8 +61,8 @@ public class TTFHmtxTable extends TTFTable {
         }
     }
 
-    private List<HMetric> hMetrics = new ArrayList<>();
-    private List<Short> leftSideBearings = new ArrayList<>();
+    private List<HMetric> hMetrics = new LinkedList<>();
+    private List<Short> leftSideBearings = new LinkedList<>();
 
     public TTFHmtxTable(SuperBufferedInputStream sbis, TTFTableManager tableManager) throws IOException {
         super("hmtx", sbis, tableManager);

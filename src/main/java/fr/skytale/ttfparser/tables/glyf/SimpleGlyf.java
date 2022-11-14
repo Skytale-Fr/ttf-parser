@@ -85,7 +85,12 @@ public class SimpleGlyf extends Glyf {
 
     @Override
     public void loadPoints(SuperBufferedInputStream sbis) throws IOException {
-        List<UInt8Flag> flags = new LinkedList<>();
+        System.out.println(numberOfContours);
+        if (numberOfContours == 0) {
+            return;
+        }
+
+        LinkedList<UInt8Flag> flags = new LinkedList<>();
         UInt8Flag flag = null;
         for(int i = 0; i < numberOfContours; i++) {
             int value = sbis.getUShort();
