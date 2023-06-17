@@ -193,7 +193,7 @@ public class CompositeGlyf extends Glyf {
         if(flags.verifyFlag(CompositeFlag.WE_HAVE_INSTRUCTIONS)) {
             instructionLength = sbis.getUShort();
             for(int i = 0; i < instructionLength; i++) {
-                instructions.add(sbis.getByte());
+                instructions.add(sbis.getUByte());
             }
         }
     }
