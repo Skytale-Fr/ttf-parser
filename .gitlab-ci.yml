@@ -66,4 +66,4 @@ Artifactory distribution:
   script:
     - 'sed -i '':a;N;$!ba;s/\(artifactory_user = \)[^\n]*/\1''"${ARTIFACTORY_USER}"''/g'' gradle.properties'
     - 'sed -i '':a;N;$!ba;s/\(artifactory_password = \)[^\n]*/\1''"${ARTIFACTORY_PASSWORD}"''/g'' gradle.properties'
-    - gradle artifactoryPublish
+    - gradle publish

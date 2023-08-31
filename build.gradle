@@ -10,11 +10,15 @@ buildscript {
 }
 
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.0.0'
     id "java"
+    id 'maven-publish'
 }
 
 group = 'fr.skytale'
-version = '1.0.1'
+version = '1.1.0'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)  // auto install
 
 compileJava {
     sourceCompatibility = JavaVersion.VERSION_1_8
@@ -61,32 +65,57 @@ tasks.named("processResources") {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
 
+// Rename generated jar
+shadowJar {
+    archiveBaseName.set("${rootProject.name}")
+    archiveClassifier.set('')
+}
+
+task sourcesJar(type: Jar) {
+    duplicatesStrategy = 'include'
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 if (project.hasProperty('artifactory_user')) {
-    apply plugin: 'com.jfrog.artifactory'
-    apply plugin: 'java'
-    apply plugin: 'maven-publish'
     publishing {
         publications {
-            mavenJava(MavenPublication) {
-                from components.java
+            shadow(MavenPublication) { publication ->
+                project.shadow.component(publication)
+                artifacts = [shadowJar, javadocJar, sourcesJar]
+                pom {
+                    name.set("TTFParser")
+                    description.set("Minecraft font ttfParser library")
+                    url.set("https://gitlab.com/skytale_/skytale-mc/libraries/resourcepacklib")
+                    licenses {
+                        license {
+                            name.set("GNU GENERAL PUBLIC LICENSE, Version 3")
+                            url.set("https://www.gnu.org/licenses/gpl-3.0.html")
+                        }
+                    }
+                    developers {
+                        developer {
+                            id.set("GrenadineDDL")
+                            name.set("GrenadineDDL")
+                            email.set("GrenadineDDL@GrenadineDDL.grenadineDDL")
+                        }
+                    }
+                }
             }
         }
-    }
-
-    artifactory {
-        contextUrl = 'https://repository.lasers-enigma.eu:443/'
-        publish {
-            repository {
-                repoKey = 'r' // The Artifactory repository key to publish to
-                username = "${artifactory_user}" // The publisher user name
-                password = "${artifactory_password}" // The publisher password
-            }
-            defaults {
-                // Reference to Gradle publications defined in the build script.
-                // This is how we tell the Artifactory Plugin which artifacts should be
-                // published to Artifactory.
-                publications('mavenJava')
-                publishArtifacts = true
+        repositories {
+            maven {
+                name = "Skytale"
+                url = "https://repository.skytale.fr/artifactory/private"
+                credentials {
+                    username = "${artifactory_user}"
+                    password = "${artifactory_password}"
+                }
             }
         }
     }
