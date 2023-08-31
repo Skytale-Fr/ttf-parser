@@ -85,7 +85,6 @@ public class SimpleGlyf extends Glyf {
 
     @Override
     public void loadPoints(SuperBufferedInputStream sbis) throws IOException {
-        System.out.println(numberOfContours);
         if (numberOfContours == 0) {
             return;
         }
