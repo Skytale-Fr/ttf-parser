@@ -30,7 +30,7 @@ jobs:
         server-id: "Skytale-Public"
         server-username: ARTIFACTORY_USER
         server-password: ARTIFACTORY_PASSWORD
-        settings-path: $HOME/.m2/
+        settings-path: $HOME/.m2/settings.xml
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
