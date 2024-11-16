@@ -21,11 +21,6 @@ jobs:
       packages: write
 
     steps:
-    - name: Prout
-      run: echo $HOME
-      env:
-        HOME: ${{ runner.workspace }}
-
     - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -39,6 +34,11 @@ jobs:
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+        HOME: ${{ runner.workspace }}
+
+    - name: Prout
+      run: ls $HOME/.m2/
+      env:
         HOME: ${{ runner.workspace }}
 
     - name: Setup Gradle
