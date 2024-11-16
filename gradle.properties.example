@@ -1,4 +1,0 @@
-# Can be used to publish to artifactory. No need to configure it locally since it's already done automatically by
-# .gitlab-ci when pushing on master or when pushing a tag
-artifactory_user = yourLogin
-artifactory_password = yourPassword

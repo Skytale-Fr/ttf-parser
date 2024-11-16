@@ -50,40 +50,35 @@ java {
     withJavadocJar()
 }
 
-if (project.hasProperty('artifactory_user')) {
-    publishing {
-        publications {
-            mavenJava(MavenPublication) { publication ->
-                artifacts = [jar, javadocJar, sourcesJar]
-                pom {
-                    name.set("TTFParser")
-                    description.set("Minecraft font ttfParser library")
-                    url.set("https://gitlab.com/skytale_/skytale-mc/libraries/resourcepacklib")
-                    licenses {
-                        license {
-                            name.set("GNU GENERAL PUBLIC LICENSE, Version 3")
-                            url.set("https://www.gnu.org/licenses/gpl-3.0.html")
-                        }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) { publication ->
+            artifacts = [jar, javadocJar, sourcesJar]
+            pom {
+                name.set("TTFParser")
+                description.set("Minecraft font ttfParser library")
+                url.set("https://gitlab.com/skytale_/skytale-mc/libraries/resourcepacklib")
+                licenses {
+                    license {
+                        name.set("GNU GENERAL PUBLIC LICENSE, Version 3")
+                        url.set("https://www.gnu.org/licenses/gpl-3.0.html")
                     }
-                    developers {
-                        developer {
-                            id.set("GrenadineDDL")
-                            name.set("GrenadineDDL")
-                            email.set("GrenadineDDL@GrenadineDDL.grenadineDDL")
-                        }
+                }
+                developers {
+                    developer {
+                        id.set("GrenadineDDL")
+                        name.set("GrenadineDDL")
+                        email.set("GrenadineDDL@GrenadineDDL.grenadineDDL")
                     }
                 }
             }
         }
-        repositories {
-            maven {
-                name = "Skytale"
-                url = "https://repository.skytale.fr/artifactory/public"
-                credentials {
-                    username = "${artifactory_user}"
-                    password = "${artifactory_password}"
-                }
-            }
+    }
+    repositories {
+        maven {
+            name = "Skytale-Public"
+            url = "https://repository.skytale.fr/artifactory/public"
         }
     }
 }
