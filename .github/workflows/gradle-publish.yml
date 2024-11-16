@@ -40,7 +40,9 @@ jobs:
     # the publishing section of your build.gradle
     - name: Publish to Skytale artifactory
       run: |
+        ls 
         cp gradle.properties.example gradle.properties
+        ls
         'sed -i '':a;N;$!ba;s/\(artifactory_user = \)[^\n]*/\1''"${ARTIFACTORY_USER}"''/g'' gradle.properties'
         'sed -i '':a;N;$!ba;s/\(artifactory_password = \)[^\n]*/\1''"${ARTIFACTORY_PASSWORD}"''/g'' gradle.properties'
         ./gradlew publish
