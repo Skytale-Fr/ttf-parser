@@ -10,7 +10,6 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow'
     id "java"
     id 'maven-publish'
 }
@@ -23,29 +22,6 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)  // auto install
 compileJava {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
-}
-
-allprojects {
-    repositories {
-        mavenCentral()
-        maven { url 'https://repository.lasers-enigma.eu:443/r' }
-    }
-}
-
-repositories {
-    mavenLocal()
-    maven { url 'https://jitpack.io' }
-    maven {
-        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
-        content {
-            includeGroup 'org.bukkit'
-            includeGroup 'org.spigotmc'
-        }
-    }
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-    maven { url 'https://oss.sonatype.org/content/groups/public/' }
-
-    maven { url "https://maven.enginehub.org/repo/" }
 }
 
 tasks.withType(Javadoc) {
@@ -65,12 +41,6 @@ tasks.named("processResources") {
     duplicatesStrategy = DuplicatesStrategy.WARN
 }
 
-// Rename generated jar
-shadowJar {
-    archiveBaseName.set("${rootProject.name}")
-    archiveClassifier.set('')
-}
-
 task sourcesJar(type: Jar) {
     duplicatesStrategy = 'include'
     classifier = 'sources'
@@ -85,9 +55,8 @@ java {
 if (project.hasProperty('artifactory_user')) {
     publishing {
         publications {
-            shadow(MavenPublication) { publication ->
-                project.shadow.component(publication)
-                artifacts = [shadowJar, javadocJar, sourcesJar]
+            mavenJava(MavenPublication) { publication ->
+                artifacts = [jar, javadocJar, sourcesJar]
                 pom {
                     name.set("TTFParser")
                     description.set("Minecraft font ttfParser library")
@@ -111,7 +80,7 @@ if (project.hasProperty('artifactory_user')) {
         repositories {
             maven {
                 name = "Skytale"
-                url = "https://repository.skytale.fr/artifactory/private"
+                url = "https://repository.skytale.fr/artifactory/public"
                 credentials {
                     username = "${artifactory_user}"
                     password = "${artifactory_password}"
