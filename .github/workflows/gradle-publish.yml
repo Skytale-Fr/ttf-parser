@@ -37,9 +37,7 @@ jobs:
         HOME: ${{ runner.workspace }}
 
     - name: Prout
-      run: |
-        ls -la $HOME/
-        ls -la $HOME/ttf-parser/
+      run: cat $HOME/ttf-parser/.m2/settings.xml
       env:
         HOME: ${{ runner.workspace }}
 
