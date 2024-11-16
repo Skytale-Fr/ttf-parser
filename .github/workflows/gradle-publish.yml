@@ -22,7 +22,7 @@ jobs:
 
     steps:
     - name: Prout
-      run: echo ${{ HOME }}
+      run: echo $HOME
       env:
         HOME: ${{ runner.workspace }}
 
@@ -35,7 +35,7 @@ jobs:
         server-id: "Skytale-Public"
         server-username: ARTIFACTORY_USER
         server-password: ARTIFACTORY_PASSWORD
-        settings-path: ${{ HOME }}/.m2/
+        settings-path: $HOME/.m2/
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
