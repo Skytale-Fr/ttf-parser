@@ -23,6 +23,8 @@ jobs:
     steps:
     - name: Prout
       run: echo ${{ HOME }}
+      env:
+        HOME: ${{ runner.workspace }}
 
     - uses: actions/checkout@v4
     - name: Set up JDK 17
@@ -37,6 +39,7 @@ jobs:
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+        HOME: ${{ runner.workspace }}
 
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
@@ -47,3 +50,5 @@ jobs:
     # the publishing section of your build.gradle
     - name: Publish to Skytale artifactory
       run: ./gradlew publish
+      env:
+        HOME: ${{ runner.workspace }}
