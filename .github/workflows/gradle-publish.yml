@@ -53,4 +53,4 @@ jobs:
     - name: Publish to Skytale artifactory
       run: ./gradlew publish
       env:
-        HOME: ${{ runner.workspace }}
+        HOME: ${{ runner.workspace }}/ttf-parser/
