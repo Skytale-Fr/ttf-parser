@@ -37,7 +37,7 @@ jobs:
         HOME: ${{ runner.workspace }}
 
     - name: Prout
-      run: ls $HOME/.m2/
+      run: ls $HOME/
       env:
         HOME: ${{ runner.workspace }}
 
