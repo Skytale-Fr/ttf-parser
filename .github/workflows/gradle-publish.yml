@@ -22,7 +22,7 @@ jobs:
 
     steps:
     - name: Prout
-      run: echo $HOME
+      run: echo ${{ HOME }}
 
     - uses: actions/checkout@v4
     - name: Set up JDK 17
