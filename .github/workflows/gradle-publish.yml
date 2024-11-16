@@ -39,7 +39,7 @@ jobs:
     - name: Prout
       run: |
         ls -la $HOME/
-        ls -la $HOME/ttfparser/
+        ls -la $HOME/ttf-parser/
       env:
         HOME: ${{ runner.workspace }}
 
