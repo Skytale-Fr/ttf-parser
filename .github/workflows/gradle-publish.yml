@@ -30,11 +30,11 @@ jobs:
         server-id: "Skytale-Public"
         server-username: ARTIFACTORY_USER
         server-password: ARTIFACTORY_PASSWORD
-        settings-path: $USER_HOME/../.m2/
+        settings-path: $USER_HOME/.m2/
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
-        USER_HOME: ${{ runner.workspace }}
+        USER_HOME: ${{ runner.workspace }}/ttf-parser/
 
     - name: Prout
       run: cat $USER_HOME/ttf-parser/.m2/settings.xml
