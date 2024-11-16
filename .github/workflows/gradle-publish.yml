@@ -30,6 +30,7 @@ jobs:
         server-id: "Skytale-Public"
         server-username: ARTIFACTORY_USER
         server-password: ARTIFACTORY_PASSWORD
+        settings-path: ${{ github.workspace }}
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
