@@ -21,6 +21,9 @@ jobs:
       packages: write
 
     steps:
+    - name: Prout
+      run: echo $HOME
+
     - uses: actions/checkout@v4
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -30,7 +33,7 @@ jobs:
         server-id: "Skytale-Public"
         server-username: ARTIFACTORY_USER
         server-password: ARTIFACTORY_PASSWORD
-        settings-path: $HOME/.m2/
+        settings-path: ${{ HOME }}/.m2/
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
